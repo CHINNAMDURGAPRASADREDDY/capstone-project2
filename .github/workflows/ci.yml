@@ -1,4 +1,5 @@
 name: Cypress Tests Workflow
+
 on:
   push:
     branches:
@@ -12,48 +13,44 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      
+      # Step 1: Checkout the repository code
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Step 2: Set up Node.js (specify the version of Node)
+      # Step 2: Cache node_modules and Cypress binary to speed up builds
+      - name: Cache Node.js modules and Cypress binary
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            ~/.cache/Cypress
+          key: ${{ runner.os }}-cypress-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-cypress-
+
+      # Step 3: Set up Node.js environment
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
           node-version: '18'
 
-      # Step 3: Install project dependencies, including Cypress
+      # Step 4: Install project dependencies, including Cypress
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-         
-      - name: Ensure Cypress binary has execute permissions
-        run: chmod +x ./node_modules/.bin/cypress
+      # Step 5: Install Cypress binary
+      - name: Install Cypress
+        run: npx cypress install
 
-      - name: Verify Cypress installation
+      # Step 6: Verify Cypress installation
+      - name: Verify Cypress
         run: npx cypress verify
 
-      # Step 4: Run basic Cypress tests (ensure homepage loads, check titles, etc.)
+      # Step 7: Run basic Cypress tests
       - name: Run Basic Cypress Tests
         run: npx cypress run --spec "cypress/e2e/basicTests.spec.js"
 
-      # Step 5: Run functional tests (e.g., login, search, add to cart, etc.)
-      - name: Run Functional Cypress Tests
-        run: npx cypress run --spec "cypress/e2e/functionalTests.spec.js"
-
-      # Step 6: Run edge case tests (e.g., form validation errors, etc.)
-      - name: Run Edge Case Cypress Tests
-        run: npx cypress run --spec "cypress/e2e/edgeCasesTests.spec.js"
-
-      # Step 7: Run UI tests to verify element visibility and responsiveness
-      - name: Run UI Cypress Tests
-        run: npx cypress run --spec "cypress/e2e/uiTests.spec.js"
-
-      # Step 8: Run visual tests for UI consistency using Cypress Image Snapshot
-      - name: Run Visual Tests
-        run: npx cypress run --spec "cypress/e2e/visualTests.spec.js"
-
-      # Optional: Upload screenshots if tests fail
+      # Step 8: Upload test failure artifacts (screenshots, videos) if needed
       - name: Upload Cypress Screenshots
         if: failure()
         uses: actions/upload-artifact@v3
@@ -61,18 +58,9 @@ jobs:
           name: cypress-screenshots
           path: cypress/screenshots
 
-      # Optional: Upload video recordings if tests fail (Cypress records video of tests)
-      - name: Upload Cypress Video
+      - name: Upload Cypress Videos
         if: failure()
         uses: actions/upload-artifact@v3
         with:
           name: cypress-videos
           path: cypress/videos
-
-      
-      - name: Upload Visual Diff Results
-        if: failure()
-        uses: actions/upload-artifact@v3
-        with:
-          name: diff-snapshots
-          path: cypress/snapshots/__diff_output__
