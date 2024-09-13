@@ -38,19 +38,23 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      # Step 5: Ensure Cypress binary is installed
+      # Step 5: Install Cypress Binary
       - name: Install Cypress Binary
         run: npx cypress install
 
-      # Step 6: Verify Cypress installation
+      # Step 6: Fix permissions on Cypress binary
+      - name: Fix Permissions
+        run: chmod +x ~/.cache/Cypress/13.14.2/Cypress/Cypress
+
+      # Step 7: Verify Cypress installation
       - name: Verify Cypress Installation
         run: npx cypress verify
 
-      # Step 7: Run Cypress tests
+      # Step 8: Run Cypress tests
       - name: Run Cypress Tests
         run: npx cypress run --spec "cypress/e2e/basicTests.spec.js"
 
-      # Step 8: Upload test failure artifacts (screenshots, videos) if needed
+      # Step 9: Upload test failure artifacts (screenshots, videos) if needed
       - name: Upload Cypress Screenshots
         if: failure()
         uses: actions/upload-artifact@v3
