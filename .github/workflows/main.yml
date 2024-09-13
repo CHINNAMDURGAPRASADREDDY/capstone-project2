@@ -1,0 +1,73 @@
+name: Cypress Tests Workflow
+
+# Trigger the workflow on push or pull request events on the main branch
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the latest code from the repo
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Step 2: Set up Node.js (specify the version of Node)
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+
+      # Step 3: Install project dependencies, including Cypress
+      - name: Install dependencies
+        run: npm install
+
+      # Step 4: Run basic Cypress tests (ensure homepage loads, check titles, etc.)
+      - name: Run Basic Cypress Tests
+        run: npx cypress run --spec "cypress/e2e/basicTests.spec.js"
+
+      # Step 5: Run functional tests (e.g., login, search, add to cart, etc.)
+      - name: Run Functional Cypress Tests
+        run: npx cypress run --spec "cypress/e2e/functionalTests.spec.js"
+
+      # Step 6: Run edge case tests (e.g., form validation errors, etc.)
+      - name: Run Edge Case Cypress Tests
+        run: npx cypress run --spec "cypress/e2e/edgeCasesTests.spec.js"
+
+      # Step 7: Run UI tests to verify element visibility and responsiveness
+      - name: Run UI Cypress Tests
+        run: npx cypress run --spec "cypress/e2e/uiTests.spec.js"
+
+      # Step 8: Run visual tests for UI consistency using Cypress Image Snapshot
+      - name: Run Visual Tests
+        run: npx cypress run --spec "cypress/e2e/visualTests.spec.js"
+
+      
+      - name: Upload Cypress Screenshots
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+
+      # Optional: Upload video recordings if tests fail (Cypress records video of tests)
+      - name: Upload Cypress Video
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: cypress-videos
+          path: cypress/videos
+
+      
+      - name: Upload Visual Diff Results
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: diff-snapshots
+          path: cypress/snapshots/__diff_output__
