@@ -1,13 +1,7 @@
 name: Cypress Tests Workflow
 
 # Trigger the workflow on push or pull request events on the main branch
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+on: [push, pull_request]
 
 jobs:
   cypress-run:
@@ -27,6 +21,13 @@ jobs:
       # Step 3: Install project dependencies, including Cypress
       - name: Install dependencies
         run: npm install --legacy-peer-deps
+
+         
+      - name: Ensure Cypress binary has execute permissions
+        run: chmod +x ./node_modules/.bin/cypress
+
+      - name: Verify Cypress installation
+        run: npx cypress verify
 
       # Step 4: Run basic Cypress tests (ensure homepage loads, check titles, etc.)
       - name: Run Basic Cypress Tests
