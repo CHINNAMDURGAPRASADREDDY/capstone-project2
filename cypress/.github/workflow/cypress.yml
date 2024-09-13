@@ -64,7 +64,7 @@ jobs:
           name: cypress-videos
           path: cypress/videos
 
-      # Optional: Upload visual diff results if visual tests fail
+      
       - name: Upload Visual Diff Results
         if: failure()
         uses: actions/upload-artifact@v2
