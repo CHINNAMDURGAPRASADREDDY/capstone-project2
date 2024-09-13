@@ -51,7 +51,7 @@ jobs:
       # Optional: Upload screenshots if tests fail
       - name: Upload Cypress Screenshots
         if: failure()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: cypress-screenshots
           path: cypress/screenshots
@@ -59,7 +59,7 @@ jobs:
       # Optional: Upload video recordings if tests fail (Cypress records video of tests)
       - name: Upload Cypress Video
         if: failure()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: cypress-videos
           path: cypress/videos
@@ -67,7 +67,7 @@ jobs:
       
       - name: Upload Visual Diff Results
         if: failure()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: diff-snapshots
           path: cypress/snapshots/__diff_output__
