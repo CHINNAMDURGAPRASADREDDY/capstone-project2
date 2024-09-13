@@ -26,7 +26,7 @@ jobs:
 
       # Step 3: Install project dependencies, including Cypress
       - name: Install dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       # Step 4: Run basic Cypress tests (ensure homepage loads, check titles, etc.)
       - name: Run Basic Cypress Tests
