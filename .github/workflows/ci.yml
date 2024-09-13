@@ -38,13 +38,12 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      # Step 5: Check for and correct file permissions (if needed)
-      - name: Ensure correct permissions for Cypress binary
-        run: |
-          chmod +x ./node_modules/.bin/cypress
+      # Step 5: Ensure Cypress binary is installed
+      - name: Install Cypress Binary
+        run: npx cypress install
 
-      # Step 6: Run Cypress verification
-      - name: Verify Cypress
+      # Step 6: Verify Cypress installation
+      - name: Verify Cypress Installation
         run: npx cypress verify
 
       # Step 7: Run Cypress tests
@@ -65,4 +64,3 @@ jobs:
         with:
           name: cypress-videos
           path: cypress/videos
-
