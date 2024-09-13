@@ -1,7 +1,11 @@
 name: Cypress Tests Workflow
-
-# Trigger the workflow on push or pull request events on the main branch
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   cypress-run:
