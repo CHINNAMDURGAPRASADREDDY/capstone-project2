@@ -1,7 +1,6 @@
-name: Cypress Tests Workflow
+name: Cypress Tests
 
-# Trigger the workflow on push or pull request events on the main branch
-on:
+on: 
   push:
     branches:
       - main
@@ -14,60 +13,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the latest code from the repo
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout the repository
+      uses: actions/checkout@v2
 
-      # Step 2: Set up Node.js (specify the version of Node)
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '18'
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16' # Specify your Node.js version here
 
-      # Step 3: Install project dependencies, including Cypress
-      - name: Install dependencies
-        run: npm install
+    - name: Install dependencies with legacy peer deps
+      run: npm ci --legacy-peer-deps
 
-      # Step 4: Run basic Cypress tests (ensure homepage loads, check titles, etc.)
-      - name: Run Basic Cypress Tests
-        run: npx cypress run --spec "cypress/e2e/basicTests.spec.js"
+    - name: Install Cypress and Mochawesome dependencies
+      run: npm install cypress mochawesome mochawesome-merge mochawesome-report-generator --legacy-peer-deps
 
-      # Step 5: Run functional tests (e.g., login, search, add to cart, etc.)
-      - name: Run Functional Cypress Tests
-        run: npx cypress run --spec "cypress/e2e/functionalTests.spec.js"
+    - name: Ensure correct permissions for Cypress
+      run: chmod +x ./node_modules/.bin/cypress
 
-      # Step 6: Run edge case tests (e.g., form validation errors, etc.)
-      - name: Run Edge Case Cypress Tests
-        run: npx cypress run --spec "cypress/e2e/edgeCasesTests.spec.js"
+    - name: Run Cypress tests with Mochawesome reporter
+      run: npx cypress run --reporter mochawesome
 
-      # Step 7: Run UI tests to verify element visibility and responsiveness
-      - name: Run UI Cypress Tests
-        run: npx cypress run --spec "cypress/e2e/uiTests.spec.js"
-
-      # Step 8: Run visual tests for UI consistency using Cypress Image Snapshot
-      - name: Run Visual Tests
-        run: npx cypress run --spec "cypress/e2e/visualTests.spec.js"
-
-      
-      - name: Upload Cypress Screenshots
-        if: failure()
-        uses: actions/upload-artifact@v2
-        with:
-          name: cypress-screenshots
-          path: cypress/screenshots
-
-      # Optional: Upload video recordings if tests fail (Cypress records video of tests)
-      - name: Upload Cypress Video
-        if: failure()
-        uses: actions/upload-artifact@v2
-        with:
-          name: cypress-videos
-          path: cypress/videos
-
-      
-      - name: Upload Visual Diff Results
-        if: failure()
-        uses: actions/upload-artifact@v2
-        with:
-          name: diff-snapshots
-          path: cypress/snapshots/__diff_output__
+    - name: Generate Mochawesome report
+      run: npx mochawesome-merge cypress/reports/*.json | npx mochawesome-report-generator --reportDir cypress/reports
